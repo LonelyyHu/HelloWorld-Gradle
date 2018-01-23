@@ -1,0 +1,65 @@
+import groovy.json.JsonBuilder
+import groovy.json.StringEscapeUtils
+
+plugins {
+    id 'base'
+  	id "com.dorongold.task-tree" version "1.3"
+}
+
+task copy(type: Copy) {
+    from 'src'
+    into 'dest'
+}
+
+task zip(type: Zip) {
+    from 'src'
+}
+
+task hello {
+    doLast {
+        println 'Hello, World!'
+    }
+}
+
+def computeVersionName() {
+    // Basic <major>.<minor>.<patch> version name
+    return "16.0.0"
+}
+
+def computeVersionCode() {
+    //   Major + minor + patch + Jenkins build number (where available)
+    //ex:  5      99      99      9999
+    return 1600010154
+}
+
+println name
+println buildDir
+
+task makeFile (dependsOn: hello) {
+
+	doLast {
+		println 'makeFile start....'
+
+		if (!buildDir.exists()) {
+			buildDir.mkdirs()
+		}
+
+		def versionFile = new File(buildDir, 'version.json')
+
+		def vName = computeVersionName()
+		def vCode = String.valueOf(computeVersionCode())
+
+		def json = new JsonBuilder()
+		json {
+		    "version" vCode
+		    "versionName" vName
+	 		"file" "_apk_url_"
+			"description" "- 新增红包领取\\n- 新增时时彩中三与和值玩法\\n- 新增11选5 组选与定位胆玩法"
+		}
+
+
+		versionFile.write(StringEscapeUtils.unescapeJava(json.toPrettyString()))
+	}
+
+	
+}
